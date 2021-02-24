@@ -7,7 +7,8 @@ import kotlinx.coroutines.delay
 import timber.log.Timber
 import kotlin.math.abs
 
-private const val MAX_ALLOWED_OFFSET = 30 // ms
+private const val MIN_THRESHOLD = 10 // ms
+private const val MAX_THRESHOLD = 20 // ms
 
 @Suppress("BlockingMethodInNonBlockingContext")
 suspend fun playFileFromCache(context: Context, fileName: String, audioDuration: Long, serverOffset: Long, globalStartTimestamp: Long, onProgress: (Boolean, Int, Long) -> Unit) {
@@ -41,13 +42,17 @@ suspend fun playFileFromCache(context: Context, fileName: String, audioDuration:
         var magicOffset = playbackOffset() - player.currentPosition
         Timber.d("magicOffset: $magicOffset")
 
+        var isSynchronizing = true
+
         while (true) { // play until job is cancelled
             val currentOffset = playbackOffset() - player.currentPosition
             Timber.d("currentOffset: $currentOffset")
 
-            if (abs(currentOffset) > MAX_ALLOWED_OFFSET) {
+            onProgress(isSynchronizing, player.currentPosition, currentOffset)
+
+            if (abs(currentOffset) > MAX_THRESHOLD || (isSynchronizing && abs(currentOffset) > MIN_THRESHOLD)) {
                 Timber.d("Correcting: $currentOffset")
-                onProgress(true, player.currentPosition, currentOffset)
+                isSynchronizing = true
                 player.setVolume(0f, 0f)
 
                 val correctedOffset = maxOf(playbackOffset() + magicOffset, 0)
@@ -64,7 +69,7 @@ suspend fun playFileFromCache(context: Context, fileName: String, audioDuration:
                 Timber.d("magicOffset: $magicOffset")
 
             } else {
-                onProgress(false, player.currentPosition, currentOffset)
+                isSynchronizing = false
                 player.setVolume(1f, 1f)
                 delay(1000)
             }
