@@ -11,9 +11,9 @@ fun PeremenManager.getActivityReadableStatus(context: Context): String = when(st
 
     Status.CACHING -> context.getString(R.string.caching)
 
-    Status.POSITIONING -> context.getString(R.string.positioning)
+    Status.DECODING -> context.getString(R.string.decoding)
 
-    Status.SYNCHRONIZING -> context.getString(R.string.synchronizing, synchronizationOffset)
+    Status.POSITIONING -> context.getString(R.string.positioning)
 
     Status.PLAYING -> context.getString(R.string.playing, playbackPosition, synchronizationOffset)
 }
@@ -24,9 +24,9 @@ fun PeremenManager.getNotificationReadableStatus(context: Context): String = whe
 
     Status.CACHING -> context.getString(R.string.caching)
 
-    Status.POSITIONING -> context.getString(R.string.positioning)
+    Status.DECODING -> context.getString(R.string.decoding)
 
-    Status.SYNCHRONIZING -> context.getString(R.string.synchronizing, synchronizationOffset)
+    Status.POSITIONING -> context.getString(R.string.positioning)
 
     Status.PLAYING -> context.getString(R.string.playing, playbackPosition, synchronizationOffset)
 }

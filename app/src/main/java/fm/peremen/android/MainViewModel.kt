@@ -10,6 +10,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val text = MutableLiveData<String>()
 
+    val text2 = MutableLiveData<String>()
+
+    val text3 = MutableLiveData<String>()
+
     val isStarted = MutableLiveData(false)
 
     @SuppressLint("StaticFieldLeak")
@@ -28,6 +32,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun update() {
         isStarted.value = PeremenManager.isStarted
         text.value = PeremenManager.getActivityReadableStatus(context)
+        text2.value = String.format("%1.0f", PeremenManager.latency)
+        text3.value = PeremenManager.skippedOnStart.toString()
     }
 
     fun onButtonClick() {

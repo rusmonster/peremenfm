@@ -8,7 +8,7 @@ import fm.peremen.android.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    val viewModel by viewModels<MainViewModel>()
+    private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,6 +16,5 @@ class MainActivity : AppCompatActivity() {
         val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        binding.buttonView.setOnClickListener { viewModel.onButtonClick() }
     }
 }

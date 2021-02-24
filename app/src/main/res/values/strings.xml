@@ -3,8 +3,8 @@
     <string name="app_name">PeremenFM</string>
 
     <string name="caching">Caching…</string>
+    <string name="decoding">Decoding…</string>
     <string name="positioning">Requesting position…</string>
-    <string name="synchronizing">Synchronizing… (%d)</string>
     <string name="playing">Playing: %d (%d)</string>
     <string name="paused">Paused</string>
 
