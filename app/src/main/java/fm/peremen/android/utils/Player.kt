@@ -11,7 +11,7 @@ private const val MIN_THRESHOLD = 10 // ms
 private const val MAX_THRESHOLD = 20 // ms
 
 @Suppress("BlockingMethodInNonBlockingContext")
-suspend fun playFileFromCache(context: Context, fileName: String, audioDuration: Long, serverOffset: Long, globalStartTimestamp: Long, onProgress: (Boolean, Int, Long) -> Unit) {
+suspend fun playFileFromCache(context: Context, fileName: String, audioDuration: Long, serverOffset: Long, globalStartTimestamp: Long, onProgress: (Boolean, Long, Long) -> Unit) {
     onProgress(true, 0, 0)
     val player = MediaPlayer()
 
@@ -48,7 +48,7 @@ suspend fun playFileFromCache(context: Context, fileName: String, audioDuration:
             val currentOffset = playbackOffset() - player.currentPosition
             Timber.d("currentOffset: $currentOffset")
 
-            onProgress(isSynchronizing, player.currentPosition, currentOffset)
+            onProgress(isSynchronizing, player.currentPosition.toLong(), currentOffset)
 
             if (abs(currentOffset) > MAX_THRESHOLD || (isSynchronizing && abs(currentOffset) > MIN_THRESHOLD)) {
                 Timber.d("Correcting: $currentOffset")

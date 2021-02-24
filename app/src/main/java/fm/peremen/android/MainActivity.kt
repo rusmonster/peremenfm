@@ -18,8 +18,4 @@ class MainActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.buttonView.setOnClickListener { viewModel.onButtonClick() }
     }
-
-    override fun onBackPressed() {
-        moveTaskToBack(true)
-    }
 }
