@@ -73,6 +73,7 @@ class PeremenService : Service() {
         val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(PeremenManager.getNotificationReadableStatus(this))
                 .setSmallIcon(R.drawable.ic_notification)
+                .setNotificationSilent()
                 .setContentIntent(pendingIntent)
 
         if (PeremenManager.isStarted) {
