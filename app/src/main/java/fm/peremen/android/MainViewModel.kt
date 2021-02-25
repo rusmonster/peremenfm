@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import fm.peremen.android.PeremenManager.Status
+import fm.peremen.android.utils.getActivityReadableStatus
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -27,25 +27,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun update() {
         isStarted.value = PeremenManager.isStarted
-
-        when (PeremenManager.status) {
-
-            Status.IDLE ->
-                text.value = if (PeremenManager.isError) context.getString(R.string.error_occured) else ""
-
-            Status.CACHING ->
-                text.value = context.getString(R.string.caching)
-
-            Status.POSITIONING ->
-                text.value = context.getString(R.string.positioning)
-
-            Status.SYNCHRONIZING ->
-                text.value = context.getString(R.string.synchronizing, PeremenManager.synchronizationOffset)
-
-            Status.PLAYING ->
-                text.value = context.getString(R.string.playing,
-                        PeremenManager.playbackPosition, PeremenManager.synchronizationOffset)
-        }
+        text.value = PeremenManager.getActivityReadableStatus(context)
     }
 
     fun onButtonClick() {

@@ -7,12 +7,7 @@ import fm.peremen.android.utils.downloadFileToCache
 import fm.peremen.android.utils.isAudioCached
 import fm.peremen.android.utils.performServerTimeOffsetRequest
 import fm.peremen.android.utils.playFileFromCache
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import kotlin.properties.Delegates
 
@@ -66,7 +61,6 @@ object PeremenManager {
         isError = false
 
         currentJob = managerScope.launch {
-            PeremenService.start(context)
             try {
                 ensureCache()
                 play()
@@ -76,7 +70,6 @@ object PeremenManager {
                 Timber.e(e)
                 isError = true
             } finally {
-                PeremenService.stop(context)
                 state = State.IDLE
                 status = Status.IDLE
             }
