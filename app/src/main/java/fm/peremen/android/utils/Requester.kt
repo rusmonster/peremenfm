@@ -15,7 +15,7 @@ suspend fun performServerTimeOffsetRequest(url: String): Long = coroutineScope {
                 val serverTimestamp = URL(url).readText().toLong()
                 val responseTimestamp = SystemClock.elapsedRealtime()
 
-                Timber.d("serverTimestamp: $serverTimestamp")
+                Timber.d("serverTimestamp: $serverTimestamp; resp-req: ${responseTimestamp - requestTimestamp}")
                 return@runCatching Sample(requestTimestamp, responseTimestamp, serverTimestamp)
             }
         }
@@ -28,6 +28,8 @@ suspend fun performServerTimeOffsetRequest(url: String): Long = coroutineScope {
         .minByOrNull { it.responseTimestamp - it.requestTimestamp }
         ?: throw RuntimeException("All serverTimestamp requests failed")
 
-    // return server time offset relative local elapsedRealtime
-    return@coroutineScope with(bestResult) { serverTimestamp - responseTimestamp }
+    with(bestResult) {
+        val networkLatency = (responseTimestamp - requestTimestamp) / 2
+        return@coroutineScope serverTimestamp + networkLatency - responseTimestamp // return server time offset relative local elapsedRealtime
+    }
 }
