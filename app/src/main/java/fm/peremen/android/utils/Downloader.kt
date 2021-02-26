@@ -5,15 +5,17 @@ package fm.peremen.android.utils
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
+import timber.log.Timber
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.URL
 
-suspend fun downloadFileToCache(context: Context, url: String, name: String) = withContext(Dispatchers.IO) {
+suspend fun downloadFileToCache(context: Context, url: String, name: String) = withCancellableContext(Dispatchers.IO) {
     URL(url).openStream().use { inputStream ->
+        yield()
         context.openFileOutput(name, MODE_PRIVATE).use { fileOutputStream ->
+            Timber.d("Copy streams...")
             inputStream.copyTo(fileOutputStream)
         }
     }

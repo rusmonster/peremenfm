@@ -79,6 +79,7 @@ object PeremenManager {
     fun stop() {
         if (state != State.STARTED) return
         state = State.STOPPING
+        Timber.d("Cancelling job...")
         currentJob.cancel()
     }
 

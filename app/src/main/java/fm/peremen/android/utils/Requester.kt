@@ -9,10 +9,10 @@ private data class Sample(val requestTimestamp: Long, val responseTimestamp: Lon
 
 suspend fun performServerTimeOffsetRequest(url: String): Long = coroutineScope {
     val requests = List(10) {
-        async(Dispatchers.IO) {
+        async {
             runCatching {
                 val requestTimestamp = SystemClock.elapsedRealtime()
-                val serverTimestamp = URL(url).readText().toLong()
+                val serverTimestamp = withCancellableContext(Dispatchers.IO) { URL(url).readText().toLong() }
                 val responseTimestamp = SystemClock.elapsedRealtime()
 
                 Timber.d("serverTimestamp: $serverTimestamp; resp-req: ${responseTimestamp - requestTimestamp}")
@@ -27,6 +27,8 @@ suspend fun performServerTimeOffsetRequest(url: String): Long = coroutineScope {
         .filterNotNull()
         .minByOrNull { it.responseTimestamp - it.requestTimestamp }
         ?: throw RuntimeException("All serverTimestamp requests failed")
+
+    Timber.d("Best result found")
 
     with(bestResult) {
         val networkLatency = (responseTimestamp - requestTimestamp) / 2
