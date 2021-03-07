@@ -3,7 +3,7 @@ package fm.peremen.android.utils
 import android.content.SharedPreferences
 
 private const val KEY_IS_AUDIO_CACHED = "KEY_IS_AUDIO_CACHED"
-private const val KEY_IS_AUDIO_DECODED = "KEY_IS_AUDIO_DECODED"
+private const val KEY_IS_AUDIO_DECODED = "KEY_IS_AUDIO_DECODED_1"
 private const val KEY_CHANNEL_COUNT = "KEY_CHANNEL_COUNT"
 private const val KEY_SAMPLE_RATE = "KEY_SAMPLE_RATE"
 private const val KEY_IS_PLAYBACK_STARTED = "KEY_IS_PLAYBACK_STARTED"
