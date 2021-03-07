@@ -20,7 +20,7 @@
 
 #ifdef DEBUG
 #ifndef MODULE_NAME
-#define MODULE_NAME  "AUDIO-APP"
+#define MODULE_NAME  "PEREMEN-FM"
 #endif
 
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, MODULE_NAME, __VA_ARGS__)

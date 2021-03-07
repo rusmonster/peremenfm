@@ -72,14 +72,19 @@ public class PlaybackEngine {
         native_play(mEngineHandle, offset, size);
     }
 
+    static void setPlaybackShift(long playbackShift) {
+        if (mEngineHandle == 0) return;
+        native_setPlaybackShift(mEngineHandle, playbackShift);
+    }
+
     static long getCurrentPositionMillis(){
         if (mEngineHandle == 0) return 0;
         return native_getCurrentPositionMillis(mEngineHandle);
     }
 
-    static long getMillsSkippedOnStart(){
+    static long getTotalPathMills(){
         if (mEngineHandle == 0) return 0;
-        return native_getMillsSkippedOnStart(mEngineHandle);
+        return native_getTotalPatchMills(mEngineHandle);
     }
 
     static double getCurrentOutputLatencyMillis(){
@@ -92,9 +97,10 @@ public class PlaybackEngine {
     private static native void native_setChannelCount(long engineHandle, int channelCount);
     private static native void native_setSampleRate(long engineHandle, int sampleRate);
     private static native long native_getCurrentPositionMillis(long engineHandle);
-    private static native long native_getMillsSkippedOnStart(long engineHandle);
+    private static native long native_getTotalPatchMills(long engineHandle);
     private static native double native_getCurrentOutputLatencyMillis(long engineHandle);
     private static native void native_setDefaultStreamValues(int sampleRate, int framesPerBurst);
     private static native void native_prepare(long engineHandle, String filePath);
     private static native void native_play(long engineHandle, long offset, long size);
+    private static native void native_setPlaybackShift(long engineHandle, long playbackShift);
 }

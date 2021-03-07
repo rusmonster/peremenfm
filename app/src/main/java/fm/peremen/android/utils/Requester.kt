@@ -5,11 +5,16 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URL
 
-suspend fun performServerTimeOffsetRequest(url: String): Long = coroutineScope {
+class TimeRequestResult(requestTimestamp: Long, responseTimestamp: Long, serverTimestamp: Long) {
+    val networkLatency = responseTimestamp - requestTimestamp
+    val serverOffset = serverTimestamp + networkLatency / 2 - responseTimestamp
 
-    data class Sample(val requestTimestamp: Long, val responseTimestamp: Long, val serverTimestamp: Long)
+    override fun toString() = "{ networkLatency: $networkLatency; serverOffset: $serverOffset }"
+}
 
-    val requests = List(10) {
+suspend fun performServerTimeRequest(url: String, attemptCount: Int = 10): TimeRequestResult = coroutineScope {
+
+    val requests = List(attemptCount) {
         async {
             runCatching {
                 val requestTimestamp = SystemClock.elapsedRealtime()
@@ -17,7 +22,7 @@ suspend fun performServerTimeOffsetRequest(url: String): Long = coroutineScope {
                 val responseTimestamp = SystemClock.elapsedRealtime()
 
                 Timber.d("serverTimestamp: $serverTimestamp; resp-req: ${responseTimestamp - requestTimestamp}")
-                return@runCatching Sample(requestTimestamp, responseTimestamp, serverTimestamp)
+                return@runCatching TimeRequestResult(requestTimestamp, responseTimestamp, serverTimestamp)
             }
         }
     }
@@ -26,13 +31,8 @@ suspend fun performServerTimeOffsetRequest(url: String): Long = coroutineScope {
         .awaitAll()
         .map { it.getOrNull() }
         .filterNotNull()
-        .minByOrNull { it.responseTimestamp - it.requestTimestamp }
+        .minByOrNull { it.networkLatency }
         ?: throw RuntimeException("All serverTimestamp requests failed")
 
-    with(bestResult) {
-        val networkLatency = (responseTimestamp - requestTimestamp) / 2
-        Timber.d("calculated networkLatency: $networkLatency")
-
-        return@coroutineScope serverTimestamp + networkLatency - responseTimestamp // return server time offset relative local elapsedRealtime
-    }
+    return@coroutineScope bestResult
 }

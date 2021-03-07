@@ -66,10 +66,11 @@ public:
     double getCurrentOutputLatencyMillis();
 
     int64_t getCurrentPositionMills();
-    int64_t getMillsSkippedOnStart() { return mAudioSource ? mAudioSource->getMillsSkippedOnStart() : -1; };
+    int64_t getTotalPatchMills() { return mAudioSource->getTotalPatchMills(); }
 
-    void prepare(const std::string& filePath);
-    void play(int64_t offsetMills, int64_t sizeMills);
+    void prepare(const std::string& filePath) { mAudioSource->prepare(filePath); }
+    void play(int64_t offsetMills, int64_t sizeMills) { mAudioSource->play(offsetMills, sizeMills); }
+    void setPlaybackShift(int64_t playbackShiftMills) { mAudioSource->setPlaybackShift(playbackShiftMills); }
 
 private:
     oboe::Result reopenStream();

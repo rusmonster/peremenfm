@@ -28,9 +28,11 @@ public:
 
     void prepare(const std::string& filePath);
     void play(int64_t offsetMills, int64_t sizeMills);
+    void setPlaybackShift(int64_t playbackShiftMills);
+
     void renderAudio(float *audioData, int32_t numFrames) override;
 
-    int64_t getMillsSkippedOnStart() { return mMillsSkippedOnStart; }
+    int64_t getTotalPatchMills();
     int64_t getEmptyFrameWritten() { return mEmptyFramesWritten; }
     int64_t getCurrentPositionMills();
 private:
@@ -38,15 +40,14 @@ private:
     std::unique_ptr<char[]> mBuffer;
 
     std::atomic<double> mStartTimestamp {0};
-    std::atomic_int64_t mStartPosition {0};
     std::atomic_int64_t mStartOffsetMills {0};
-    std::atomic_int64_t mMillsSkippedOnStart {0};
     std::atomic_int64_t mSizeMills {0};
 
     std::atomic_int64_t mPosition {0};
     std::atomic_int64_t mSizeSamples {0};
     std::atomic_int64_t mEmptyFramesWritten {0};
-    std::atomic_int64_t mTotalPatchBytes {0};
+    std::atomic_int64_t mTotalPatchSamples {0};
+    std::atomic_int64_t mPlaybackShiftMills {0};
 
     std::atomic_bool mJustStarted {false};
     std::atomic_bool mIsPlaying {false};

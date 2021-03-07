@@ -118,7 +118,7 @@ JNI_METHOD_NAME_(native_1getCurrentPositionMillis)(
 }
 
 JNIEXPORT jlong JNICALL
-JNI_METHOD_NAME_(native_1getMillsSkippedOnStart)(
+JNI_METHOD_NAME_(native_1getTotalPatchMills)(
         JNIEnv *env,
         jclass,
         jlong engineHandle) {
@@ -128,7 +128,7 @@ JNI_METHOD_NAME_(native_1getMillsSkippedOnStart)(
         LOGE("Engine is null, you must call createEngine before calling this method");
         return static_cast<jlong>(-1);
     }
-    return static_cast<jlong>(engine->getMillsSkippedOnStart());
+    return static_cast<jlong>(engine->getTotalPatchMills());
 }
 
 JNIEXPORT jdouble JNICALL
@@ -188,6 +188,21 @@ JNI_METHOD_NAME_(native_1play)(
         return;
     }
     engine->play(offset, size);
+}
+
+JNIEXPORT void JNICALL
+JNI_METHOD_NAME_(native_1setPlaybackShift)(
+        JNIEnv *env,
+        jclass type,
+        jlong engineHandle,
+        jlong playbackShift) {
+
+    OboeEngine *engine = reinterpret_cast<OboeEngine*>(engineHandle);
+    if (engine == nullptr) {
+        LOGE("Engine is null, you must call createEngine before calling this method");
+        return;
+    }
+    engine->setPlaybackShift(playbackShift);
 }
 
 } // extern "C"

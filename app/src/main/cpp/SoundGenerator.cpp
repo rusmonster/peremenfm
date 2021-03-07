@@ -20,7 +20,7 @@
 
 static constexpr int64_t kHardSyncThresholdMills = 200;
 static constexpr int64_t kSoftSyncThresholdMills = 2;
-static constexpr int64_t kSoftSyncIntervalFrames = 20;
+static constexpr int64_t kSoftSyncIntervalFrames = 50;
 
 SoundGenerator::SoundGenerator(std::shared_ptr<oboe::AudioStream> oboeStream)
         : mStream(std::move(oboeStream)) {}
@@ -32,41 +32,32 @@ void SoundGenerator::renderAudio(float *audioData, int32_t numFrames) {
         return;
     }
 
-    if (mJustStarted.exchange(false)) { // first render after call play()
-        auto latencyResult = mStream->calculateLatencyMillis();
-        double startLatency = latencyResult ? latencyResult.value() : kDefaultLatency;
-        LOGD("startLatency: %f", latencyResult.value());
-        double startDelay = millsNow() - mStartTimestamp;
-        LOGD("startDelay: %f", startDelay);
-        int64_t millsToSkip = startDelay + startLatency;
-        LOGD("millsToSkip: %ld", millsToSkip);
-        int64_t samplesToSkip = millsToSamples(millsToSkip, mStream);
-        LOGD("samplesToSkip: %ld", samplesToSkip);
-        mPosition += samplesToSkip;
-        mMillsSkippedOnStart = millsToSkip;
-    }
-
     int64_t millsSinceStart = millsNow() - mStartTimestamp;
-    int64_t estimatedOffsetMills = (mStartOffsetMills + millsSinceStart) % mSizeMills;
+    int64_t estimatedOffsetMills = (mStartOffsetMills + millsSinceStart + mPlaybackShiftMills) % mSizeMills;
     int64_t synchronizationOffsetMills = estimatedOffsetMills - getCurrentPositionMills();
-    int64_t synchronizationPatchBytes = 0;
+    int64_t synchronizationPatchSamples = 0;
 
-    if (abs(synchronizationOffsetMills) > kHardSyncThresholdMills) {
+//    static int k = 0;
+//    if (++k % 100 == 0) {
+//        LOGD("synchronizationOffsetMills: %ld", synchronizationOffsetMills);
+//    }
+//
+    if (mJustStarted.exchange(false) || abs(synchronizationOffsetMills) > kHardSyncThresholdMills) {
         LOGD("synchronization: hard shift: %ld", synchronizationOffsetMills);
-        int64_t patchBytes = millsToBytes(synchronizationOffsetMills, mStream);
-        mPosition += patchBytes;
-        mTotalPatchBytes += patchBytes;
+        int64_t patchSamples = millsToSamples(synchronizationOffsetMills, mStream);
+        mPosition = (mPosition + patchSamples) % mSizeSamples;
+        mTotalPatchSamples += patchSamples;
     } else if (abs(synchronizationOffsetMills) > kSoftSyncThresholdMills) {
         // soft adjust
-        int64_t synchronizationPatchSamples = synchronizationOffsetMills > 0 ? 1 : -1;
-        synchronizationPatchBytes = synchronizationPatchSamples * mStream->getBytesPerSample();
+        synchronizationPatchSamples = synchronizationOffsetMills > 0 ? 1 : -1;
     }
 
-    static int k = 0;
-    if (++k % 100 == 0) {
-        LOGD("synchronizationOffsetMills: %ld", synchronizationOffsetMills);
-    }
-
+//    static int64_t oldSynchronizationPatchSamples = 0;
+//    if (oldSynchronizationPatchSamples != synchronizationPatchSamples) {
+//        LOGD("SYNC: %ld", synchronizationPatchSamples);
+//        oldSynchronizationPatchSamples = synchronizationPatchSamples;
+//    }
+//
     auto buffer = reinterpret_cast<int16_t*>(audioData);
     auto source = reinterpret_cast<int16_t*>(mBuffer.get());
 
@@ -78,10 +69,9 @@ void SoundGenerator::renderAudio(float *audioData, int32_t numFrames) {
             mPosition = ++mPosition % mSizeSamples;
         }
 
-        if (synchronizationPatchBytes != 0 && j % kSoftSyncIntervalFrames == 0) {
-            LOGD("synchronization: soft shift: %ld", synchronizationPatchBytes);
-            mPosition = (mPosition + synchronizationPatchBytes) % mSizeSamples;
-            mTotalPatchBytes += synchronizationPatchBytes;
+        if (synchronizationPatchSamples != 0 && j % kSoftSyncIntervalFrames == 0) {
+            mPosition = (mPosition + synchronizationPatchSamples) % mSizeSamples;
+            mTotalPatchSamples += synchronizationPatchSamples;
         }
     }
 }
@@ -91,10 +81,10 @@ int64_t SoundGenerator::getCurrentPositionMills() {
     int64_t latencyMills = latencyResult ? latencyResult.value() : kDefaultLatency;
     int64_t latencyFrames = millsToFrames(latencyMills, mStream);
 
-    int64_t audioFramesWritten = mStream->getFramesWritten() - getEmptyFrameWritten() - latencyFrames;
+    int64_t audioFramesWritten = mStream->getFramesWritten() - mEmptyFramesWritten - latencyFrames;
     int64_t writtenMills = audioFramesWritten * 1000 / mStream->getSampleRate();
-    int64_t patchMills = bytesToMills(mTotalPatchBytes, mStream);
-    int64_t playedMills = mStartOffsetMills + writtenMills + getMillsSkippedOnStart() + patchMills;
+    int64_t patchMills = samplesToMills(mTotalPatchSamples, mStream);
+    int64_t playedMills = mStartOffsetMills + writtenMills + patchMills;
     int64_t currentPositionMills = (mSizeMills > 0) ? playedMills % mSizeMills : playedMills;
 
     //int64_t millsSinceStart = millsNow() - mStartTimestamp;
@@ -127,10 +117,18 @@ void SoundGenerator::play(int64_t offsetMills, int64_t sizeMills) {
     int64_t offsetSamples = millsToSamples(offsetMills, mStream);
     int64_t sizeSamples = millsToSamples(sizeMills, mStream);
 
-    mStartPosition = offsetSamples;
     mPosition = offsetSamples;
     mSizeSamples = sizeSamples;
 
     mJustStarted = true;
     mIsPlaying = true;
+}
+
+void SoundGenerator::setPlaybackShift(int64_t playbackShiftMills) {
+    LOGD("setPlaybackShift: %ld; old: %ld; diff: %ld", playbackShiftMills, mPlaybackShiftMills.load(), playbackShiftMills - mPlaybackShiftMills);
+    mPlaybackShiftMills = playbackShiftMills;
+}
+
+int64_t SoundGenerator::getTotalPatchMills() {
+    return samplesToMills(mTotalPatchSamples, mStream);
 }

@@ -108,11 +108,3 @@ oboe::Result OboeEngine::reopenStream() {
     stop();
     return start();
 }
-
-void OboeEngine::prepare(const std::string& filePath) {
-    mAudioSource->prepare(filePath);
-}
-
-void OboeEngine::play(int64_t offsetMills, int64_t sizeMills) {
-    mAudioSource->play(offsetMills, sizeMills);
-}
