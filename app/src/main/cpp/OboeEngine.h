@@ -82,11 +82,8 @@ private:
 
     int32_t        mChannelCount = oboe::Unspecified;
     int32_t        mSampleRate = oboe::kUnspecified;
-    std::mutex     mLock;
 
-    int64_t        mInitialOffsetMills = 0;
-    int64_t        mSizeMills = 0;
-    int64_t        mStartTime = 0;
+    std::mutex     mLock;
 };
 
 #endif //OBOE_ENGINE_H

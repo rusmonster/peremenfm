@@ -25,3 +25,10 @@ inline int64_t millsToSamples(int64_t mills, const std::shared_ptr<oboe::AudioSt
 inline int64_t millsToFrames(int64_t mills, const std::shared_ptr<oboe::AudioStream>& oboeStream) {
     return millsToBytes(mills, oboeStream) / oboeStream->getBytesPerFrame();
 }
+
+inline int64_t bytesToMills(int64_t bytes, const std::shared_ptr<oboe::AudioStream>& oboeStream) {
+    const int64_t kBytesPerMillisecond = oboeStream->getBytesPerFrame() * oboeStream->getSampleRate() / 1000;
+
+    int64_t mills = bytes / kBytesPerMillisecond;
+    return mills;
+}

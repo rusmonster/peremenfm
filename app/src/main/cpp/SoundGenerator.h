@@ -27,21 +27,29 @@ public:
     ~SoundGenerator() = default;
 
     void prepare(const std::string& filePath);
-    void play(int64_t offsetSamples, int64_t sizeSamples);
+    void play(int64_t offsetMills, int64_t sizeMills);
     void renderAudio(float *audioData, int32_t numFrames) override;
 
-    int64_t getFakesFrameWritten() { return mFakeFramesWritten; }
-    int64_t getMillsSkippedOnStart() { return mMillsSkippedOnStartStartDelay; }
+    int64_t getMillsSkippedOnStart() { return mMillsSkippedOnStart; }
+    int64_t getEmptyFrameWritten() { return mEmptyFramesWritten; }
+    int64_t getCurrentPositionMills();
 private:
     const std::shared_ptr<oboe::AudioStream> mStream;
-
     std::unique_ptr<char[]> mBuffer;
+
+    std::atomic<double> mStartTimestamp {0};
+    std::atomic_int64_t mStartPosition {0};
+    std::atomic_int64_t mStartOffsetMills {0};
+    std::atomic_int64_t mMillsSkippedOnStart {0};
+    std::atomic_int64_t mSizeMills {0};
+
     std::atomic_int64_t mPosition {0};
-    std::atomic_int64_t mSize {0};
-    std::atomic_int64_t mFakeFramesWritten {0};
+    std::atomic_int64_t mSizeSamples {0};
+    std::atomic_int64_t mEmptyFramesWritten {0};
+    std::atomic_int64_t mTotalPatchBytes {0};
+
+    std::atomic_bool mJustStarted {false};
     std::atomic_bool mIsPlaying {false};
-    std::atomic<double> mStartPlayTimestamp {0};
-    std::atomic_int64_t mMillsSkippedOnStartStartDelay {0};
 };
 
 #endif //SAMPLES_SOUNDGENERATOR_H

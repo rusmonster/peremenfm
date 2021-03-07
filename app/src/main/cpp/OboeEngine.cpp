@@ -43,22 +43,7 @@ double OboeEngine::getCurrentOutputLatencyMillis() {
 
 int64_t OboeEngine::getCurrentPositionMills() {
     std::lock_guard<std::mutex> lock(mLock);
-    if (!mStream || !mAudioSource) return -1;
-
-    auto latencyResult = mStream->calculateLatencyMillis();
-    int64_t latencyMills = latencyResult ? latencyResult.value() : kDefaultLatency;
-    int64_t latencyFrames = millsToFrames(latencyMills, mStream);
-
-    int64_t audioFramesWritten = mStream->getFramesWritten() - mAudioSource->getFakesFrameWritten() - latencyFrames;
-    int64_t writtenMills = audioFramesWritten * 1000 / mStream->getSampleRate();
-    int64_t playedMills = mInitialOffsetMills + writtenMills + mAudioSource->getMillsSkippedOnStart();
-    int64_t currentPositionMills = (mSizeMills > 0) ? playedMills % mSizeMills : playedMills;
-
-    //int64_t millsSinceStart = millsNow() - mStartTime;
-    // The idea is that (millsSinceStart == millsSkippedOnStart) at the moment when (writtenMills == 0)
-    //LOGD("writtenMills: %ld; fakeFrames: %06ld; millsSinceStart: %ld; skippedOnStart: %ld", writtenMills, mAudioSource->getFakesFrameWritten(), millsSinceStart, mAudioSource->getMillsSkippedOnStart());
-
-    return currentPositionMills;
+    return mAudioSource ? mAudioSource->getCurrentPositionMills() : -1;
 }
 
 void OboeEngine::setChannelCount(int channelCount) {
@@ -129,11 +114,5 @@ void OboeEngine::prepare(const std::string& filePath) {
 }
 
 void OboeEngine::play(int64_t offsetMills, int64_t sizeMills) {
-    mInitialOffsetMills = offsetMills;
-    mSizeMills = sizeMills;
-    mStartTime = millsNow();
-
-    int64_t offsetSamples = millsToSamples(offsetMills, mStream);
-    int64_t sizeSamples = millsToSamples(sizeMills, mStream);
-    mAudioSource->play(offsetSamples, sizeSamples);
+    mAudioSource->play(offsetMills, sizeMills);
 }
