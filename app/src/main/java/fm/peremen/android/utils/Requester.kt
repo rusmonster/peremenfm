@@ -12,7 +12,7 @@ class TimeRequestResult(requestTimestamp: Long, responseTimestamp: Long, serverT
     override fun toString() = "{ networkLatency: $networkLatency; serverOffset: $serverOffset }"
 }
 
-suspend fun performServerTimeRequest(url: String, attemptCount: Int = 10): TimeRequestResult = coroutineScope {
+suspend fun performServerTimeRequest(url: String, attemptCount: Int = 3): TimeRequestResult = coroutineScope {
 
     val requests = List(attemptCount) {
         async {

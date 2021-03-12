@@ -132,7 +132,7 @@ object PeremenManager {
         if (serverTimeResults.isEmpty()) {
             status = Status.POSITIONING
             Timber.d("Positioning begin")
-            val serverTimeResult = performServerTimeRequest(TIME_URL, 5)
+            val serverTimeResult = performServerTimeRequest(TIME_URL)
             Timber.d("initial network latency: ${serverTimeResult.networkLatency}")
             updateServerOffset(serverTimeResult)
         }
@@ -140,9 +140,9 @@ object PeremenManager {
 
     private suspend fun updateServerOffsetContinuously() {
         while (true) {
-            delay(2000)
+            delay(1000 + (1000 * random().toLong()))
 
-            val result = runCatching { performServerTimeRequest(TIME_URL, 5) }.getOrNull() ?: continue
+            val result = runCatching { performServerTimeRequest(TIME_URL) }.getOrNull() ?: continue
             updateServerOffset(result)
 
             playbackShift = serverOffset - serverOffsetOnStartPlaying
@@ -190,17 +190,17 @@ object PeremenManager {
     }
 
     private fun updateServerOffset(result: TimeRequestResult) {
-//        Timber.d("serverTimeResults:")
+//        Timber.d("serverTimeResults: ${serverTimeResults.size}")
 //        serverTimeResults.forEachIndexed { i, r -> Timber.d("\t$i) $r") }
 
         serverTimeResults += result
-        while (serverTimeResults.size > 100) serverTimeResults.remove(serverTimeResults.last())
+        while (serverTimeResults.size > 10) serverTimeResults.remove(serverTimeResults.last())
 
         val avgOffset = serverTimeResults.sumOf { it.serverOffset } / serverTimeResults.size
         val avgDiff = serverTimeResults.sumOf { abs(it.serverOffset - avgOffset) } / serverTimeResults.size
 
 //        Timber.d("new result: $result")
-//        Timber.d("new serverTimeResults:")
+//        Timber.d("new serverTimeResults: ${serverTimeResults.size}")
 //        serverTimeResults.forEachIndexed { i, r -> Timber.d("\t$i) $r; diff: ${ abs(r.serverOffset - avgOffset) }") }
 
         val preciseResults = serverTimeResults.filter { abs(it.serverOffset - avgOffset) <= avgDiff }
@@ -208,10 +208,9 @@ object PeremenManager {
         severOffsetAccuracy = preciseResults.sumOf { abs(it.serverOffset - preciseAvgOffset) } / preciseResults.size
         severOffsetUsedProbesCount = preciseResults.size
 
-//        Timber.d("preciseResults:")
+//        Timber.d("preciseResults: ${preciseResults.size}")
 //        preciseResults.forEachIndexed { i, r -> Timber.d("\t$i) $r; diff: ${ abs(r.serverOffset - avgOffset) }") }
 
-        Timber.d("preciseAvgOffset: $preciseAvgOffset; old: $serverOffset; diff: ${ abs(serverOffset - preciseAvgOffset) }")
         serverOffset = preciseAvgOffset
     }
 }
