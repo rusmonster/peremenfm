@@ -77,7 +77,7 @@ void SoundGenerator::renderAudio(int16_t *audioData, int32_t numFrames) {
 
 int64_t SoundGenerator::getCurrentPositionMills() {
     auto latencyResult = mStream->calculateLatencyMillis();
-    int64_t latencyMills = latencyResult ? latencyResult.value() : kDefaultLatency;
+    double latencyMills = latencyResult ? latencyResult.value() : kDefaultLatency;
     int64_t latencyFrames = millsToFrames(latencyMills, mStream);
 
     int64_t audioFramesWritten = mStream->getFramesWritten() - mEmptyFramesWritten - latencyFrames;

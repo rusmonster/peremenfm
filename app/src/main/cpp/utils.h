@@ -9,27 +9,27 @@ inline double millsNow() {
     return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
-inline int64_t millsToBytes(int64_t mills, const std::shared_ptr<oboe::AudioStream>& oboeStream) {
-    const int64_t kBytesPerMillisecond = oboeStream->getBytesPerFrame() * oboeStream->getSampleRate() / 1000;
+inline double bytesPerMillisecond(const std::shared_ptr<oboe::AudioStream>& oboeStream) {
+    return oboeStream->getBytesPerFrame() * oboeStream->getSampleRate() / 1000.0;
+}
 
-    int64_t bytes = mills * kBytesPerMillisecond;
+inline int64_t millsToBytes(double mills, const std::shared_ptr<oboe::AudioStream>& oboeStream) {
+    int64_t bytes = mills * bytesPerMillisecond(oboeStream);
     bytes = bytes / oboeStream->getBytesPerFrame() * oboeStream->getBytesPerFrame(); // align value
 
     return bytes;
 }
 
-inline int64_t millsToSamples(int64_t mills, const std::shared_ptr<oboe::AudioStream>& oboeStream) {
+inline int64_t millsToSamples(double mills, const std::shared_ptr<oboe::AudioStream>& oboeStream) {
     return millsToBytes(mills, oboeStream) / oboeStream->getBytesPerSample();
 }
 
-inline int64_t millsToFrames(int64_t mills, const std::shared_ptr<oboe::AudioStream>& oboeStream) {
+inline int64_t millsToFrames(double mills, const std::shared_ptr<oboe::AudioStream>& oboeStream) {
     return millsToBytes(mills, oboeStream) / oboeStream->getBytesPerFrame();
 }
 
-inline int64_t samplesToMills(int64_t samples, const std::shared_ptr<oboe::AudioStream>& oboeStream) {
-    const int64_t kBytesPerMillisecond = oboeStream->getBytesPerFrame() * oboeStream->getSampleRate() / 1000;
-
+inline double samplesToMills(int64_t samples, const std::shared_ptr<oboe::AudioStream>& oboeStream) {
     int64_t bytes = samples * oboeStream->getBytesPerSample();
-    int64_t mills = bytes / kBytesPerMillisecond;
+    double mills = bytes / bytesPerMillisecond(oboeStream);
     return mills;
 }
