@@ -36,7 +36,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         text.value = PeremenManager.getActivityReadableStatus(context)
         text2.value = "Latency: ${String.format("%1.0f", PeremenManager.latency)}; TotalPatchMills ${PeremenManager.totalPatchMills}"
         text3.value = "Shift: ${PeremenManager.playbackShift}"
-        text4.value = "SeverTimeAccuracy: ${PeremenManager.severOffsetAccuracy}"
+        text4.value = "SeverTimeAccuracy: ${PeremenManager.severOffsetAccuracy} (${PeremenManager.severOffsetUsedProbesCount})"
     }
 
     fun onButtonClick() {

@@ -39,6 +39,9 @@ object PeremenManager {
     var severOffsetAccuracy: Long = 0
         private set
 
+    var severOffsetUsedProbesCount: Int = 0
+        private set
+
     var synchronizationOffset: Long = 0
         private set
 
@@ -202,6 +205,7 @@ object PeremenManager {
         val preciseResults = serverTimeResults.filter { abs(it.serverOffset - avgOffset) <= avgDiff }
         val preciseAvgOffset = preciseResults.sumOf { it.serverOffset } / preciseResults.size
         severOffsetAccuracy = preciseResults.sumOf { abs(it.serverOffset - preciseAvgOffset) } / preciseResults.size
+        severOffsetUsedProbesCount = preciseResults.size
 
 //        Timber.d("preciseResults:")
 //        preciseResults.forEachIndexed { i, r -> Timber.d("\t$i) $r; diff: ${ abs(r.serverOffset - avgOffset) }") }
