@@ -24,7 +24,6 @@
 class SoundGenerator : public IRenderableAudio {
 public:
     SoundGenerator(std::shared_ptr<oboe::AudioStream> oboeStream);
-    ~SoundGenerator() = default;
 
     void prepare(const std::string& filePath);
     void play(int64_t offsetMills, int64_t sizeMills);
@@ -33,7 +32,6 @@ public:
     void renderAudio(int16_t *audioData, int32_t numFrames) override;
 
     int64_t getTotalPatchMills();
-    int64_t getEmptyFrameWritten() { return mEmptyFramesWritten; }
     int64_t getCurrentPositionMills();
 private:
     const std::shared_ptr<oboe::AudioStream> mStream;
