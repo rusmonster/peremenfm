@@ -30,7 +30,7 @@ public:
     void play(int64_t offsetMills, int64_t sizeMills);
     void setPlaybackShift(int64_t playbackShiftMills);
 
-    void renderAudio(float *audioData, int32_t numFrames) override;
+    void renderAudio(int16_t *audioData, int32_t numFrames) override;
 
     int64_t getTotalPatchMills();
     int64_t getEmptyFrameWritten() { return mEmptyFramesWritten; }

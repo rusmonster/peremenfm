@@ -25,7 +25,7 @@ static constexpr int64_t kSoftSyncIntervalFrames = 50;
 SoundGenerator::SoundGenerator(std::shared_ptr<oboe::AudioStream> oboeStream)
         : mStream(std::move(oboeStream)) {}
 
-void SoundGenerator::renderAudio(float *audioData, int32_t numFrames) {
+void SoundGenerator::renderAudio(int16_t *audioData, int32_t numFrames) {
     if (!mIsPlaying) {
         memset(audioData, 0, numFrames * mStream->getBytesPerFrame());
         mEmptyFramesWritten += numFrames;
@@ -58,15 +58,14 @@ void SoundGenerator::renderAudio(float *audioData, int32_t numFrames) {
 //        oldSynchronizationPatchSamples = synchronizationPatchSamples;
 //    }
 //
-    auto buffer = reinterpret_cast<int16_t*>(audioData);
     auto source = reinterpret_cast<int16_t*>(mBuffer.get());
 
     int channelCount = mStream->getChannelCount();
 
     for (int j = 0; j < numFrames; ++j) {
         for (int i = 0; i < channelCount; ++i) {
-            buffer[(j * channelCount) + i] = source[mPosition];
             mPosition = ++mPosition % mSizeSamples;
+            audioData[(j * channelCount) + i] = source[*mPosition];
         }
 
         if (synchronizationPatchSamples != 0 && j % kSoftSyncIntervalFrames == 0) {
