@@ -16,7 +16,7 @@ private const val AUDIO_FILE_URL = "https://prmn.rogozhin.pro/snd/peremen.mp3"
 private const val AUDIO_FILE_NAME = "peremen.mp3"
 private const val AUDIO_FILE_NAME_PCM = "peremen.raw"
 private const val AUDIO_FILE_LENGTH = 296250L
-private const val RADIO_START_TIMESTAMP = 1612384206341
+private const val RADIO_START_TIMESTAMP = 1612384206000L
 
 @SuppressLint("StaticFieldLeak")
 object PeremenManager {
