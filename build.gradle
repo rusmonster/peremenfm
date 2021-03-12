@@ -1,4 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+wrapper {
+    gradleVersion = '6.7'
+    distributionType = Wrapper.DistributionType.ALL
+}
+
 buildscript {
     ext.kotlin_version = "1.4.31"
     ext.kotlinx_coroutines_version = '1.4.1'
