@@ -45,9 +45,6 @@ public:
     // From IRestartable
     void restart() override;
 
-    void setChannelCount(int channelCount);
-    void setSampleRate(int sampleRate);
-
     /**
      * Calculate the current latency between writing a frame to the output stream and
      * the same frame being presented to the audio hardware.
@@ -73,7 +70,6 @@ public:
     void setPlaybackShift(int64_t playbackShiftMills) { mAudioSource->setPlaybackShift(playbackShiftMills); }
 
 private:
-    oboe::Result reopenStream();
     oboe::Result createPlaybackStream();
 
     std::shared_ptr<oboe::AudioStream> mStream;

@@ -26,23 +26,20 @@ public class PlaybackEngine {
         System.loadLibrary("peremenfm");
     }
 
-    static boolean create(Context context){
+    static boolean create(){
 
         if (mEngineHandle == 0){
-            setDefaultStreamValues(context);
             mEngineHandle = native_createEngine();
         }
         return (mEngineHandle != 0);
     }
 
-    private static void setDefaultStreamValues(Context context) {
+    static void setDefaultStreamValues(Context context, int defaultSampleRate, int defaultChannelCount) {
         AudioManager myAudioMgr = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        String sampleRateStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
-        int defaultSampleRate = Integer.parseInt(sampleRateStr);
         String framesPerBurstStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
         int defaultFramesPerBurst = Integer.parseInt(framesPerBurstStr);
 
-        native_setDefaultStreamValues(defaultSampleRate, defaultFramesPerBurst);
+        native_setDefaultStreamValues(defaultSampleRate, defaultChannelCount, defaultFramesPerBurst);
     }
 
     static void delete(){
@@ -50,16 +47,6 @@ public class PlaybackEngine {
             native_deleteEngine(mEngineHandle);
         }
         mEngineHandle = 0;
-    }
-
-    static void setChannelCount(int channelCount) {
-        if (mEngineHandle == 0) return;
-        native_setChannelCount(mEngineHandle, channelCount);
-    }
-
-    static void setSampleRate(int sampleRate) {
-        if (mEngineHandle == 0) return;
-        native_setSampleRate(mEngineHandle, sampleRate);
     }
 
     static void prepare(String filePath) {
@@ -94,12 +81,10 @@ public class PlaybackEngine {
 
     private static native long native_createEngine();
     private static native void native_deleteEngine(long engineHandle);
-    private static native void native_setChannelCount(long engineHandle, int channelCount);
-    private static native void native_setSampleRate(long engineHandle, int sampleRate);
     private static native long native_getCurrentPositionMillis(long engineHandle);
     private static native long native_getTotalPatchMills(long engineHandle);
     private static native double native_getCurrentOutputLatencyMillis(long engineHandle);
-    private static native void native_setDefaultStreamValues(int sampleRate, int framesPerBurst);
+    private static native void native_setDefaultStreamValues(int sampleRate, int channelCount, int framesPerBurst);
     private static native void native_prepare(long engineHandle, String filePath);
     private static native void native_play(long engineHandle, long offset, long size);
     private static native void native_setPlaybackShift(long engineHandle, long playbackShift);

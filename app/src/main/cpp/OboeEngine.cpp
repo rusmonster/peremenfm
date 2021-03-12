@@ -29,9 +29,11 @@
  *
  */
 OboeEngine::OboeEngine()
-        : mLatencyCallback(std::make_unique<LatencyTuningCallback>()),
-        mErrorCallback(std::make_unique<DefaultErrorCallback>(*this)) {
-}
+        : mLatencyCallback(std::make_unique<LatencyTuningCallback>())
+        , mErrorCallback(std::make_unique<DefaultErrorCallback>(*this))
+        , mChannelCount(oboe::DefaultStreamValues::ChannelCount)
+        , mSampleRate(oboe::DefaultStreamValues::SampleRate)
+{}
 
 double OboeEngine::getCurrentOutputLatencyMillis() {
     std::lock_guard<std::mutex> lock(mLock);
@@ -44,16 +46,6 @@ double OboeEngine::getCurrentOutputLatencyMillis() {
 int64_t OboeEngine::getCurrentPositionMills() {
     std::lock_guard<std::mutex> lock(mLock);
     return mAudioSource ? mAudioSource->getCurrentPositionMills() : -1;
-}
-
-void OboeEngine::setChannelCount(int channelCount) {
-    mChannelCount = channelCount;
-    reopenStream();
-}
-
-void OboeEngine::setSampleRate(int sampleRate) {
-    mSampleRate = sampleRate;
-    reopenStream();
 }
 
 oboe::Result OboeEngine::createPlaybackStream() {
@@ -102,9 +94,4 @@ void OboeEngine::stop() {
         mStream->close();
         mStream.reset();
     }
-}
-
-oboe::Result OboeEngine::reopenStream() {
-    stop();
-    return start();
 }

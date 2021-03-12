@@ -154,11 +154,9 @@ object PeremenManager {
         status = Status.PLAYING
 
         try {
-            PlaybackEngine.create(context)
-
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-            PlaybackEngine.setChannelCount(sharedPreferences.channelCount)
-            PlaybackEngine.setSampleRate(sharedPreferences.sampleRate)
+            PlaybackEngine.setDefaultStreamValues(context, sharedPreferences.sampleRate, sharedPreferences.channelCount)
+            PlaybackEngine.create()
 
             val file = context.getFileStreamPath(AUDIO_FILE_NAME_PCM)
             PlaybackEngine.prepare(file.absolutePath)

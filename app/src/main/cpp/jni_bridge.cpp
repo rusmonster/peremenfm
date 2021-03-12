@@ -73,36 +73,6 @@ JNI_METHOD_NAME_(native_1deleteEngine)(
     delete engine;
 }
 
-JNIEXPORT void JNICALL
-JNI_METHOD_NAME_(native_1setChannelCount)(
-        JNIEnv *env,
-        jclass type,
-        jlong engineHandle,
-        jint channelCount) {
-
-    OboeEngine *engine = reinterpret_cast<OboeEngine*>(engineHandle);
-    if (engine == nullptr) {
-        LOGE("Engine handle is invalid, call createHandle() to create a new one");
-        return;
-    }
-    engine->setChannelCount(channelCount);
-}
-
-JNIEXPORT void JNICALL
-JNI_METHOD_NAME_(native_1setSampleRate)(
-        JNIEnv *env,
-        jclass type,
-        jlong engineHandle,
-        jint sampleRate) {
-
-    OboeEngine *engine = reinterpret_cast<OboeEngine*>(engineHandle);
-    if (engine == nullptr) {
-        LOGE("Engine handle is invalid, call createHandle() to create a new one");
-        return;
-    }
-    engine->setSampleRate(sampleRate);
-}
-
 JNIEXPORT jlong JNICALL
 JNI_METHOD_NAME_(native_1getCurrentPositionMillis)(
         JNIEnv *env,
@@ -150,8 +120,10 @@ JNI_METHOD_NAME_(native_1setDefaultStreamValues)(
         JNIEnv *env,
         jclass type,
         jint sampleRate,
+        jint channelCount,
         jint framesPerBurst) {
     oboe::DefaultStreamValues::SampleRate = (int32_t) sampleRate;
+    oboe::DefaultStreamValues::ChannelCount = (int32_t) channelCount;
     oboe::DefaultStreamValues::FramesPerBurst = (int32_t) framesPerBurst;
 }
 
