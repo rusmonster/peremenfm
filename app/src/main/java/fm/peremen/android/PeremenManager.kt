@@ -8,11 +8,12 @@ import androidx.preference.PreferenceManager
 import fm.peremen.android.utils.*
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.lang.Math.random
 import kotlin.math.abs
 import kotlin.properties.Delegates
 
 private const val TIME_URL = "https://prmn.rogozhin.pro/time2"
-private const val AUDIO_FILE_URL = "https://prmn.rogozhin.pro/snd/peremen.mp3"
+private const val AUDIO_FILE_URL = "https://prmn.rogozhin.pro/snd/peremen2.mp3"
 private const val AUDIO_FILE_NAME = "peremen.mp3"
 private const val AUDIO_FILE_NAME_PCM = "peremen.raw"
 private const val AUDIO_FILE_LENGTH = 296250L
