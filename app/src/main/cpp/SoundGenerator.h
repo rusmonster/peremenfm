@@ -39,17 +39,18 @@ private:
     const std::shared_ptr<oboe::AudioStream> mStream;
     std::unique_ptr<char[]> mBuffer;
 
+    class Position;
+    std::shared_ptr<Position> mPosition;
+
     std::atomic<double> mStartTimestamp {0};
     std::atomic_int64_t mStartOffsetMills {0};
     std::atomic_int64_t mSizeMills {0};
 
-    std::atomic_int64_t mPosition {0};
-    std::atomic_int64_t mSizeSamples {0};
     std::atomic_int64_t mEmptyFramesWritten {0};
     std::atomic_int64_t mTotalPatchSamples {0};
     std::atomic_int64_t mPlaybackShiftMills {0};
 
-    std::atomic_bool mJustStarted {false};
+    std::atomic_bool mIsJustStarted {false};
     std::atomic_bool mIsPlaying {false};
 };
 
