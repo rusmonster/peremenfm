@@ -7,7 +7,7 @@ import java.net.URL
 
 class TimeRequestResult(requestTimestamp: Long, responseTimestamp: Long, serverTimestamp: Long) {
     val networkLatency = responseTimestamp - requestTimestamp
-    val serverOffset = serverTimestamp + networkLatency / 2 - responseTimestamp
+    val serverOffset = serverTimestamp - responseTimestamp
 
     override fun toString() = "{ networkLatency: $networkLatency; serverOffset: $serverOffset }"
 }
