@@ -33,12 +33,16 @@ public:
 
     int64_t getTotalPatchMills();
     int64_t getCurrentPositionMills();
+
+private:
+    void updatePosition(int64_t positionSamples);
+
 private:
     const std::shared_ptr<oboe::AudioStream> mStream;
     std::unique_ptr<char[]> mBuffer;
 
-    class Position;
-    std::shared_ptr<Position> mPosition;
+    int64_t mSizeSamples;
+    int64_t mPositionSamples;
 
     std::atomic<double> mStartTimestamp {0};
     std::atomic_int64_t mStartOffsetMills {0};

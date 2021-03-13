@@ -22,28 +22,6 @@ static constexpr int64_t kHardSyncThresholdMills = 200;
 static constexpr int64_t kSoftSyncThresholdMills = 2;
 static constexpr int64_t kSoftSyncIntervalFrames = 50;
 
-class SoundGenerator::Position {
-public:
-    explicit Position(int64_t positionSamples, int64_t sizeSamples)
-            : mSizeSamples(sizeSamples)
-            , mPositionSamples(positionSamples)
-    {}
-
-    const Position& operator+=(int64_t offsetSamples) {
-        mPositionSamples = (mPositionSamples + offsetSamples) % mSizeSamples;
-        if (mPositionSamples < 0) {
-            mPositionSamples += mSizeSamples;
-        }
-        return *this;
-    }
-
-    inline operator int64_t() const { return mPositionSamples; }
-
-private:
-    int64_t mSizeSamples;
-    int64_t mPositionSamples;
-};
-
 SoundGenerator::SoundGenerator(std::shared_ptr<oboe::AudioStream> oboeStream)
         : mStream(std::move(oboeStream)) {}
 
@@ -75,15 +53,14 @@ void SoundGenerator::renderAudio(int16_t *audioData, int32_t numFrames) {
 
     bool isJustStarted = mIsJustStarted.exchange(false);
     if (isJustStarted) {
-        int64_t positionSamples = millsToSamples(mStartOffsetMills, mStream);
-        int64_t sizeSamples = millsToSamples(mSizeMills, mStream);
-        mPosition = std::make_shared<Position>(positionSamples, sizeSamples);
+        mSizeSamples = millsToSamples(mSizeMills, mStream);
+        mPositionSamples = millsToSamples(mStartOffsetMills, mStream);
     }
 
     if (isJustStarted || abs(synchronizationOffsetMills) > kHardSyncThresholdMills) {
         LOGD("synchronization: hard shift: %ld", synchronizationOffsetMills);
         int64_t patchSamples = millsToSamples(synchronizationOffsetMills, mStream);
-        *mPosition += patchSamples;
+        updatePosition(mPositionSamples + patchSamples);
         mTotalPatchSamples += patchSamples;
     } else if (abs(synchronizationOffsetMills) > kSoftSyncThresholdMills) {
         // soft adjust
@@ -96,12 +73,12 @@ void SoundGenerator::renderAudio(int16_t *audioData, int32_t numFrames) {
 
     for (int j = 0; j < numFrames; ++j) {
         for (int i = 0; i < channelCount; ++i) {
-            audioData[(j * channelCount) + i] = source[*mPosition];
-            *mPosition += 1;
+            audioData[(j * channelCount) + i] = source[mPositionSamples];
+            updatePosition(mPositionSamples + 1);
         }
 
         if (synchronizationPatchSamples != 0 && j % kSoftSyncIntervalFrames == 0) {
-            *mPosition += synchronizationPatchSamples;
+            updatePosition(mPositionSamples + synchronizationPatchSamples);
             mTotalPatchSamples += synchronizationPatchSamples;
         }
     }
@@ -156,4 +133,11 @@ void SoundGenerator::setPlaybackShift(int64_t playbackShiftMills) {
 
 int64_t SoundGenerator::getTotalPatchMills() {
     return samplesToMills(mTotalPatchSamples, mStream);
+}
+
+void SoundGenerator::updatePosition(int64_t positionSamples) {
+    mPositionSamples = positionSamples % mSizeSamples;
+    if (mPositionSamples < 0) {
+        mPositionSamples += mSizeSamples;
+    }
 }
