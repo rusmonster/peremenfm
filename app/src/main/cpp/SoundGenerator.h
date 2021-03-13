@@ -41,8 +41,8 @@ private:
     const std::shared_ptr<oboe::AudioStream> mStream;
     std::unique_ptr<char[]> mBuffer;
 
-    int64_t mSizeSamples;
-    int64_t mPositionSamples;
+    int64_t mSizeSamples {0};
+    int64_t mPositionSamples {0};
 
     std::atomic<double> mStartTimestamp {0};
     std::atomic_int64_t mStartOffsetMills {0};
