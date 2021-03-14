@@ -1,0 +1,74 @@
+name: Build, Upload to Internal Testinig and share on telegram.
+on:
+  push:
+    branches:
+      - "!*"
+    tags:
+      - "v*"
+jobs:
+  build:
+    name: Build app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Settting up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Decode Signing Settings
+        run: |
+            echo "${{ secrets.KEYSTORE }}" | base64 --decode > app/keystoreapk
+            echo "${{ secrets.BUILD_GRADLE_ADDON }}" | base64 --decode >> app/build.gradle
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=version::${GITHUB_REF#refs/tags/}
+      - name: Runing build command
+        run: |
+          VERSION_CODE=`git rev-list --count HEAD`
+          (( VERSION_CODE += 100 ))
+          ./gradlew bundleRelease -PversionCode="$VERSION_CODE" -PversionName="${{ steps.get_version.outputs.version }}"
+      - name: Uploading build
+        uses: actions/upload-artifact@v2
+        with:
+          name: bundle
+          path: app/build/outputs/bundle/release/app-release.aab
+
+  upload_to_internal_app_sharing:
+    name: Upload to Google Play
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Downloading build
+        uses: actions/download-artifact@v2
+        with:
+          name: bundle
+      - name: Internal Testing Sharing
+        id: ias
+        uses: rusmonster/internal-app-sharing-action@v1.2.0
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: 'fm.peremen.android'
+          aabFilePath: 'app-release.aab'
+          track: 'internal'
+
+  sent_telegram_message:
+    name: Send telegram message
+    needs: upload_to_internal_app_sharing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out repo
+        uses: actions/checkout@v2
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=version::${GITHUB_REF#refs/tags/}
+      - name: Send telegram message
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.PEREMEN_CHAT_ID }}
+          token: ${{ secrets.PEREMEN_BUILDER_BOT_TOKEN }}
+          document: release.gif
+          message: "*New PeremenFM for android released (${{ steps.get_version.outputs.version }}):*\n https://play.google.com/apps/internaltest/4699749469240426147"
+          format: markdown

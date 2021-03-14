@@ -12,8 +12,12 @@ android {
         applicationId "fm.peremen.android"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        versionCode Integer.valueOf(findProperty("versionCode") ?: "1")
+        versionName findProperty("versionName") ?: "0.0.1"
+
+        println("versionCode: ${versionCode}")
+        println("versionName: ${versionName}")
+
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++14"
@@ -32,6 +36,9 @@ android {
             }
         }
         release {
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
