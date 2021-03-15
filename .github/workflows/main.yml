@@ -78,6 +78,6 @@ jobs:
           format: markdown
           disable_web_page_preview: true
           message: |
-            *New PeremenFM for android released:*
+            *New PeremenFM for android ${{ steps.get_version.outputs.version }} released:*
             [Google Play](https://play.google.com/apps/internaltest/4699749469240426147)
             [Github Release](https://github.com/rusmonster/peremenfm/releases/tag/${{ steps.get_version.outputs.version }})
