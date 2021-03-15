@@ -29,12 +29,18 @@ jobs:
         run: |
           VERSION_CODE=`git rev-list --count HEAD`
           (( VERSION_CODE += 100 ))
-          ./gradlew bundleRelease -PversionCode="$VERSION_CODE" -PversionName="${{ steps.get_version.outputs.version }}"
+          ./gradlew assembleRelease bundleRelease -PversionCode="$VERSION_CODE" -PversionName="${{ steps.get_version.outputs.version }}"
       - name: Uploading build
         uses: actions/upload-artifact@v2
         with:
           name: bundle
           path: app/build/outputs/bundle/release/app-release.aab
+      - name: Create gihub release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: app/build/outputs/apk/release/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   upload_to_internal_app_sharing:
     name: Upload to Google Play
@@ -46,7 +52,6 @@ jobs:
         with:
           name: bundle
       - name: Internal Testing Sharing
-        id: ias
         uses: rusmonster/internal-app-sharing-action@v1.2.0
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
@@ -70,5 +75,9 @@ jobs:
           to: ${{ secrets.PEREMEN_CHAT_ID }}
           token: ${{ secrets.PEREMEN_BUILDER_BOT_TOKEN }}
           document: release.gif
-          message: "*New PeremenFM for android released (${{ steps.get_version.outputs.version }}):*\n https://play.google.com/apps/internaltest/4699749469240426147"
           format: markdown
+          disable_web_page_preview: true
+          message: |
+            *New PeremenFM for android released:*
+            [Google Play](https://play.google.com/apps/internaltest/4699749469240426147)
+            [Github Release](https://github.com/rusmonster/peremenfm/releases/tag/${{ steps.get_version.outputs.version }})
