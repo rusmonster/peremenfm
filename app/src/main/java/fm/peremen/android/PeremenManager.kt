@@ -35,12 +35,6 @@ object PeremenManager {
     var playbackShift: Long = 0
         private set
 
-    var severOffsetAccuracy: Long = 0
-        private set
-
-    var severOffsetUsedProbesCount: Int = 0
-        private set
-
     var synchronizationOffset: Long = 0
         private set
 
@@ -177,6 +171,5 @@ object PeremenManager {
 
         playbackShift = serverOffset - serverOffsetOnStartPlaying
         PlaybackEngine.setPlaybackShift(playbackShift)
-
     }
 }

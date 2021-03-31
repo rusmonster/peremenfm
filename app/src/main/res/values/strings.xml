@@ -5,7 +5,7 @@
     <string name="caching">Caching…</string>
     <string name="decoding">Decoding…</string>
     <string name="positioning">Requesting position…</string>
-    <string name="playing">Playing: %1$d (%2$d)</string>
+    <string name="playing">Playing: %s</string>
     <string name="paused">Paused</string>
 
     <string name="notification_action_play">Play</string>

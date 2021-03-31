@@ -22,6 +22,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val isKeepScreenOn = MutableLiveData(true)
 
+    val showDebugInfo = BuildConfig.DEBUG
+
     @SuppressLint("StaticFieldLeak")
     private val context = application.applicationContext
 
@@ -41,7 +43,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         text.value = PeremenManager.getActivityReadableStatus(context)
         text2.value = "Latency: ${String.format("%1.0f", PeremenManager.latency)}; TotalPatchMills ${PeremenManager.totalPatchMills}"
         text3.value = "Shift: ${PeremenManager.playbackShift}"
-        text4.value = "ServerTimeAccuracy: ${PeremenManager.severOffsetAccuracy} (${PeremenManager.severOffsetUsedProbesCount})"
+        text4.value = "PlaybackPosition: ${PeremenManager.playbackPosition} (${PeremenManager.synchronizationOffset})"
     }
 
     private fun keepScreenOnUntilNoServerOffset() = viewModelScope.launch {
