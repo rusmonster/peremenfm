@@ -2,8 +2,8 @@ package fm.peremen.android
 
 import android.Manifest
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import fm.peremen.android.databinding.ActivityMainBinding
@@ -20,10 +20,19 @@ class MainActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         binding.buttonView.setOnClickListener { viewModel.onButtonClick() }
+        binding.buttonInfo.setOnClickListener { showInfoDialog() }
 
         if (savedInstanceState == null) {
             ensureLocationPermission()
         }
+    }
+
+    private fun showInfoDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_info_title)
+            .setView(R.layout.dialog_info)
+            .setPositiveButton(R.string.ok) { _, _ -> }
+            .show()
     }
 
     private fun ensureLocationPermission() {
