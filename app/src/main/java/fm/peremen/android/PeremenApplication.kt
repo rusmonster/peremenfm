@@ -25,6 +25,7 @@ class PeremenApplication : Application(), LifecycleObserver {
             PeremenService.start(this)
         }
     }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onForeground() {
         PeremenService.stop(this)

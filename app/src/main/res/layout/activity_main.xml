@@ -11,7 +11,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:keepScreenOn="@{viewModel.isKeepScreenOn()}">
 
         <ImageView
             android:layout_width="match_parent"
@@ -28,7 +29,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:src="@{viewModel.isStarted ? @drawable/ic_baseline_pause_circle_outline_24 : @drawable/ic_baseline_play_circle_outline_24}"
-            android:onClick="@{ _ -> viewModel.onButtonClick() }"
             tools:srcCompat="@drawable/ic_baseline_play_circle_outline_24" />
 
         <TextView

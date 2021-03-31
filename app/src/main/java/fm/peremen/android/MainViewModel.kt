@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import fm.peremen.android.utils.getActivityReadableStatus
+import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -18,10 +20,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val isStarted = MutableLiveData(false)
 
+    val isKeepScreenOn = MutableLiveData(true)
+
     @SuppressLint("StaticFieldLeak")
     private val context = application.applicationContext
 
     init {
+        keepScreenOnUntilNoServerOffset()
         update()
         PeremenManager.onChanged += this::update
     }
@@ -37,6 +42,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         text2.value = "Latency: ${String.format("%1.0f", PeremenManager.latency)}; TotalPatchMills ${PeremenManager.totalPatchMills}"
         text3.value = "Shift: ${PeremenManager.playbackShift}"
         text4.value = "ServerTimeAccuracy: ${PeremenManager.severOffsetAccuracy} (${PeremenManager.severOffsetUsedProbesCount})"
+    }
+
+    private fun keepScreenOnUntilNoServerOffset() = viewModelScope.launch {
+        PeremenManager.ensureServerOffset()
+        isKeepScreenOn.value = false
     }
 
     fun onButtonClick() {
