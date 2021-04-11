@@ -69,7 +69,7 @@
             android:gravity="center"
             android:textSize="14sp"
             android:text="@{viewModel.text}"
-            tools:text="@string/caching" />
+            tools:text="@string/decoding" />
 
         <TextView
             android:id="@+id/textView2"
@@ -85,7 +85,7 @@
             android:gravity="center"
             android:textSize="14sp"
             android:text="@{viewModel.text2}"
-            tools:text="@string/caching" />
+            tools:text="@string/decoding" />
 
         <TextView
             android:id="@+id/textView3"
@@ -101,7 +101,7 @@
             android:gravity="center"
             android:textSize="14sp"
             android:text="@{viewModel.text3}"
-            tools:text="@string/caching" />
+            tools:text="@string/decoding" />
 
         <TextView
             android:id="@+id/textView4"
@@ -117,7 +117,7 @@
             android:gravity="center"
             android:textSize="14sp"
             android:text="@{viewModel.text4}"
-            tools:text="@string/caching" />
+            tools:text="@string/decoding" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

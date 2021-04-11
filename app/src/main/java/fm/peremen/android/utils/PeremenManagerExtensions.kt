@@ -9,8 +9,6 @@ fun PeremenManager.getActivityReadableStatus(context: Context): String = when(st
 
     Status.IDLE -> if (isError) context.getString(R.string.error_occured) else ""
 
-    Status.CACHING -> context.getString(R.string.caching)
-
     Status.DECODING -> context.getString(R.string.decoding)
 
     Status.POSITIONING -> context.getString(R.string.positioning)
@@ -21,8 +19,6 @@ fun PeremenManager.getActivityReadableStatus(context: Context): String = when(st
 fun PeremenManager.getNotificationReadableStatus(context: Context): String = when(status) {
 
     Status.IDLE -> if (isError) context.getString(R.string.error_occured) else context.getString(R.string.paused)
-
-    Status.CACHING -> context.getString(R.string.caching)
 
     Status.DECODING -> context.getString(R.string.decoding)
 

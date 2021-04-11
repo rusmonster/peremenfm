@@ -11,15 +11,14 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import kotlin.properties.Delegates
 
-private const val AUDIO_FILE_URL = "https://prmn.rogozhin.pro/snd/peremen2.mp3"
-private const val AUDIO_FILE_NAME = "peremen.mp3"
-private const val AUDIO_FILE_NAME_PCM = "peremen.raw"
+private const val AUDIO_FILE_NAME = "peremen2.mp3"
+private const val AUDIO_FILE_NAME_PCM = "peremen2.raw"
 private const val AUDIO_FILE_LENGTH = 296250L
 private const val RADIO_START_TIMESTAMP = 1612384206000L
 
 @SuppressLint("StaticFieldLeak")
 object PeremenManager {
-    enum class Status { IDLE, CACHING, DECODING, POSITIONING, PLAYING }
+    enum class Status { IDLE, DECODING, POSITIONING, PLAYING }
 
     var status by Delegates.observable(Status.IDLE) { _, _, _ -> notifyChanged() }
         private set
@@ -106,14 +105,6 @@ object PeremenManager {
 
     private suspend fun ensureCache() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-
-        if (!sharedPreferences.isAudioCached) {
-            status = Status.CACHING
-            Timber.d("Caching begin")
-            downloadFileToCache(context, AUDIO_FILE_URL, AUDIO_FILE_NAME)
-            sharedPreferences.isAudioCached = true
-            Timber.d("Caching success")
-        }
 
         if (!sharedPreferences.isAudioDecoded) {
             status = Status.DECODING

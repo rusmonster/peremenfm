@@ -2,16 +2,11 @@ package fm.peremen.android.utils
 
 import android.content.SharedPreferences
 
-private const val KEY_IS_AUDIO_CACHED = "KEY_IS_AUDIO_CACHED"
 private const val KEY_IS_AUDIO_DECODED = "KEY_IS_AUDIO_DECODED"
 private const val KEY_CHANNEL_COUNT = "KEY_CHANNEL_COUNT"
 private const val KEY_SAMPLE_RATE = "KEY_SAMPLE_RATE"
 private const val KEY_IS_PLAYBACK_STARTED = "KEY_IS_PLAYBACK_STARTED"
 private const val KEY_IS_GPS_EXPLANATION_SHOWN = "KEY_IS_GPS_EXPLANATION_SHOWN"
-
-var SharedPreferences.isAudioCached: Boolean
-    get() = getBoolean(KEY_IS_AUDIO_CACHED, false)
-    set(value) { edit().putBoolean(KEY_IS_AUDIO_CACHED, value).apply() }
 
 var SharedPreferences.isAudioDecoded: Boolean
     get() = getBoolean(KEY_IS_AUDIO_DECODED, false)

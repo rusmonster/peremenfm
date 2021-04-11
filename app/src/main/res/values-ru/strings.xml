@@ -2,7 +2,6 @@
 
     <string name="app_name">Перемен ФМ</string>
 
-    <string name="caching">Загрузка…</string>
     <string name="decoding">Распаковка…</string>
     <string name="positioning">Синхронизация…</string>
     <string name="playing">Воспроизведение: %s</string>

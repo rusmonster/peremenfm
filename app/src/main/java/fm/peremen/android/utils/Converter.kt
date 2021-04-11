@@ -11,13 +11,11 @@ import timber.log.Timber
 private const val TIMEOUT = -1L
 
 suspend fun convertMp3ToPcm(context: Context, inputFilename: String, outputFilename: String): MediaFormat {
+    val inputFile = context.assets.openFd(inputFilename)
     val outputStream = context.openFileOutput(outputFilename, MODE_PRIVATE)
 
-    val inputFile = context.getFileStreamPath(inputFilename)
-    Timber.d("inputPath: ${inputFile.absolutePath}")
-
     val extractor = MediaExtractor()
-    extractor.setDataSource(inputFile.absolutePath)
+    extractor.setDataSource(inputFile)
     extractor.selectTrack(0)
 
     val inputFormat = extractor.getTrackFormat(0)
