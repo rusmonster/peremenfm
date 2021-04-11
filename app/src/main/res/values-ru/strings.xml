@@ -1,0 +1,28 @@
+<resources>
+
+    <string name="app_name">Перемен ФМ</string>
+
+    <string name="caching">Загрузка…</string>
+    <string name="decoding">Распаковка…</string>
+    <string name="positioning">Синхронизация…</string>
+    <string name="playing">Воспроизведение: %s</string>
+    <string name="paused">Пауза</string>
+
+    <string name="notification_action_play">Играть</string>
+    <string name="notification_action_pause">Пауза</string>
+    <string name="notification_action_stop">Стоп</string>
+
+    <string name="error_occured">Произошла ошибка. Попробуйте еще раз</string>
+    <string name="error_occured_notification">Произошла ошибка</string>
+    <string name="location_permission_explanation">Приложение может использовать GPS для получения точного времени,
+        необходимого для синхронизации воспроизведения при отсутствии подключения к Интернет</string>
+    <string name="ok">OK</string>
+
+    <string name="dialog_info_title">Информация</string>
+    <string name="dialog_info_text">Перемен ФМ - это приложение с открытым исходным кодом:</string>
+    <string name="dialog_info_link">https://github.com/rusmonster/peremenfm</string>
+
+    <string name="share_text">Перемен ФМ: %s</string>
+    <string name="share_link">https://play.google.com/store/apps/details?id=fm.peremen.android</string>
+
+</resources>
