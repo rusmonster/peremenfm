@@ -1,6 +1,7 @@
 package fm.peremen.android
 
 import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -20,11 +21,26 @@ class MainActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         binding.buttonView.setOnClickListener { viewModel.onButtonClick() }
+        binding.buttonShare.setOnClickListener { share() }
         binding.buttonInfo.setOnClickListener { showInfoDialog() }
 
         if (savedInstanceState == null) {
             ensureLocationPermission()
         }
+    }
+
+    private fun share() {
+        val messageLink = getString(R.string.share_link)
+        val messageText = getString(R.string.share_text, messageLink)
+
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, messageText)
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        runCatching { startActivity(shareIntent) }
     }
 
     private fun showInfoDialog() {
