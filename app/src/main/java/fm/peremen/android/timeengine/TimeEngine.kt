@@ -12,11 +12,13 @@ import kotlin.math.abs
 private const val kNtpOffsetCorrectionMills: Long = -30
 private const val kGpsOffsetCorrectionMills: Long = 20
 
+private class TimestampTimeoutException : Exception("Cannot get server timestamp")
+
 class TimeEngine(private val context: Context, val onTimeChanged: (Long) -> Unit) {
 
     private val timeOffsetStorage = TimeOffsetStorage(context)
 
-    private val firstServerOffset = CompletableDeferred<Long>()
+    private var firstServerOffset = CompletableDeferred<Long>()
 
     private var isStarted = false
 
@@ -30,10 +32,15 @@ class TimeEngine(private val context: Context, val onTimeChanged: (Long) -> Unit
         isStarted = true
         Timber.d("TimeEngine started")
 
-        createFlow().collect {
-            onTimeChanged(it)
-            firstServerOffset.complete(it)
-        }
+        createFlow()
+            .catch {
+                firstServerOffset.completeExceptionally(it)
+                firstServerOffset = CompletableDeferred()
+            }
+            .collect {
+                onTimeChanged(it)
+                firstServerOffset.complete(it)
+            }
 
         isStarted = false
         Timber.d("TimeEngine finished")
@@ -67,7 +74,7 @@ class TimeEngine(private val context: Context, val onTimeChanged: (Long) -> Unit
         return combinedFlow
             .conflate()
             .onEach { delay(1000) }
-            .untilMillsAfterConditionMatch(120_000) { it.accuracyLevel == AccuracyLevel.PERFECT }
+            .untilMillsAfterConditionMatch(120_000, 600_000) { it.accuracyLevel == AccuracyLevel.PERFECT }
             .filter { it.accuracyLevel >= AccuracyLevel.GOOD }
             .onEach { Timber.d("combinedFlow: ${it.accuracyLevel}; $it") }
             .mapNotNull { it as? TimeData.Data }
@@ -120,11 +127,16 @@ private fun Flow<TimeData>.distinctUntilSourceAccuracyChanged() = distinctUntilC
     }
 }
 
-private fun Flow<TimeData>.untilMillsAfterConditionMatch(mills: Long, condition: (TimeData) -> Boolean): Flow<TimeData> {
-    val firstConditionMatch = object { var timestamp: Long? = null }
+private fun Flow<TimeData>.untilMillsAfterConditionMatch(mills: Long, maxMills: Long, condition: (TimeData) -> Boolean): Flow<TimeData> {
+    val startTimestamp = SystemClock.elapsedRealtime()
+    var firstConditionMatchTimestamp: Long? = null
 
     return takeWhile { timeData ->
-        firstConditionMatch.timestamp
+        if (SystemClock.elapsedRealtime() - startTimestamp > maxMills && firstConditionMatchTimestamp == null) {
+            throw TimestampTimeoutException()
+        }
+
+        firstConditionMatchTimestamp
             ?.takeIf { SystemClock.elapsedRealtime() - it > mills }
             ?.also { Timber.d("untilMillsAfterConditionMatch: stop flow") }
             ?.run { return@takeWhile false }
@@ -133,8 +145,8 @@ private fun Flow<TimeData>.untilMillsAfterConditionMatch(mills: Long, condition:
             return@takeWhile true
         }
 
-        if (firstConditionMatch.timestamp == null) {
-            firstConditionMatch.timestamp = SystemClock.elapsedRealtime()
+        if (firstConditionMatchTimestamp == null) {
+            firstConditionMatchTimestamp = SystemClock.elapsedRealtime()
         }
 
         return@takeWhile true

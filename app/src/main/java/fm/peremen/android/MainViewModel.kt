@@ -47,7 +47,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun keepScreenOnUntilNoServerOffset() = viewModelScope.launch {
-        PeremenManager.ensureServerOffset()
+        runCatching { PeremenManager.ensureServerOffset() }
         isKeepScreenOn.value = false
     }
 
