@@ -7,8 +7,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.preference.PreferenceManager
 import fm.peremen.android.databinding.ActivityMainBinding
 import fm.peremen.android.utils.hasGpsPermission
+import fm.peremen.android.utils.isGpsExplanationShown
 
 class MainActivity : AppCompatActivity() {
 
@@ -56,8 +58,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val isGpsExplanationShown = sharedPreferences.isGpsExplanationShown
+        val shouldShowRequestPermissionRationale = shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        if (!isGpsExplanationShown || shouldShowRequestPermissionRationale) {
             LocationPermissionExplanationDialog().show(supportFragmentManager, null)
+            sharedPreferences.isGpsExplanationShown = true
             return
         }
 

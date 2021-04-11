@@ -7,6 +7,7 @@ private const val KEY_IS_AUDIO_DECODED = "KEY_IS_AUDIO_DECODED"
 private const val KEY_CHANNEL_COUNT = "KEY_CHANNEL_COUNT"
 private const val KEY_SAMPLE_RATE = "KEY_SAMPLE_RATE"
 private const val KEY_IS_PLAYBACK_STARTED = "KEY_IS_PLAYBACK_STARTED"
+private const val KEY_IS_GPS_EXPLANATION_SHOWN = "KEY_IS_GPS_EXPLANATION_SHOWN"
 
 var SharedPreferences.isAudioCached: Boolean
     get() = getBoolean(KEY_IS_AUDIO_CACHED, false)
@@ -27,3 +28,7 @@ var SharedPreferences.sampleRate: Int
 var SharedPreferences.isPlaybackStarted: Boolean
     get() = getBoolean(KEY_IS_PLAYBACK_STARTED, false)
     set(value) { edit().putBoolean(KEY_IS_PLAYBACK_STARTED, value).apply() }
+
+var SharedPreferences.isGpsExplanationShown: Boolean
+    get() = getBoolean(KEY_IS_GPS_EXPLANATION_SHOWN, false)
+    set(value) { edit().putBoolean(KEY_IS_GPS_EXPLANATION_SHOWN, value).apply() }
