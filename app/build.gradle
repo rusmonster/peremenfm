@@ -5,13 +5,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    namespace "fm.peremen.android"
+    compileSdk 34
 
     defaultConfig {
-        applicationId "fm.peremen.android"
-        minSdkVersion 24
-        targetSdkVersion 30
+        minSdk 24
+        targetSdk 34
         versionCode Integer.valueOf(findProperty("versionCode") ?: "1")
         versionName findProperty("versionName") ?: "0.0.1"
 

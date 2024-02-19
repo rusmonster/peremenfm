@@ -25,7 +25,7 @@ class GpsTimeSource(id: Int, private val context: Context) : AccuracyTimeSource(
         val listener = object : LocationListener {
             override fun onLocationChanged(location: Location) {
                 Timber.d("onLocationChanged provider: ${location.provider}; acc: ${location.accuracy}; time: ${location.time}; systemTimDiff: ${System.currentTimeMillis() - location.time}")
-                runCatching { offer(TimeRequestResult(location.time - SystemClock.elapsedRealtime(), location.accuracy.toDouble())) }
+                runCatching { trySend(TimeRequestResult(location.time - SystemClock.elapsedRealtime(), location.accuracy.toDouble())) }
             }
 
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
