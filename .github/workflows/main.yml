@@ -59,25 +59,25 @@ jobs:
           aabFilePath: 'app-release.aab'
           track: 'internal'
 
-  sent_telegram_message:
-    name: Send telegram message
-    needs: upload_to_internal_app_sharing
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checking out repo
-        uses: actions/checkout@v2
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=version::${GITHUB_REF#refs/tags/}
-      - name: Send telegram message
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.PEREMEN_CHAT_ID }}
-          token: ${{ secrets.PEREMEN_BUILDER_BOT_TOKEN }}
-          document: release.gif
-          format: markdown
-          disable_web_page_preview: true
-          message: |
-            *New PeremenFM for android ${{ steps.get_version.outputs.version }} released:*
-            [Google Play](https://play.google.com/apps/internaltest/4699749469240426147)
-            [Github Release](https://github.com/rusmonster/peremenfm/releases/tag/${{ steps.get_version.outputs.version }})
+  # sent_telegram_message:
+  #   name: Send telegram message
+  #   needs: upload_to_internal_app_sharing
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checking out repo
+  #       uses: actions/checkout@v2
+  #     - name: Get the version
+  #       id: get_version
+  #       run: echo ::set-output name=version::${GITHUB_REF#refs/tags/}
+  #     - name: Send telegram message
+  #       uses: appleboy/telegram-action@master
+  #       with:
+  #         to: ${{ secrets.PEREMEN_CHAT_ID }}
+  #         token: ${{ secrets.PEREMEN_BUILDER_BOT_TOKEN }}
+  #         document: release.gif
+  #         format: markdown
+  #         disable_web_page_preview: true
+  #         message: |
+  #           *New PeremenFM for android ${{ steps.get_version.outputs.version }} released:*
+  #           [Google Play](https://play.google.com/apps/internaltest/4699749469240426147)
+  #           [Github Release](https://github.com/rusmonster/peremenfm/releases/tag/${{ steps.get_version.outputs.version }})
