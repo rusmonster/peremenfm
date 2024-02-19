@@ -68,7 +68,7 @@ class PeremenService : Service() {
 
     private fun createNotification(): Notification {
         val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
+        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(PeremenManager.getNotificationReadableStatus(this))
@@ -78,18 +78,18 @@ class PeremenService : Service() {
 
         if (PeremenManager.isStarted) {
             val intent = Intent(ACTION_PAUSE).apply { setClass(this@PeremenService, PeremenService::class.java) }
-            val pauseIntent = PendingIntent.getService(this, 0, intent, 0)
+            val pauseIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
             val pauseTitle = getString(R.string.notification_action_pause)
             notificationBuilder.addAction(R.drawable.ic_baseline_pause_circle_outline_24, pauseTitle, pauseIntent)
         } else {
             val intent = Intent(ACTION_PLAY).apply { setClass(this@PeremenService, PeremenService::class.java) }
-            val playIntent = PendingIntent.getService(this, 0, intent, 0)
+            val playIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
             val playTitle = getString(R.string.notification_action_play)
             notificationBuilder.addAction(R.drawable.ic_baseline_play_circle_outline_24, playTitle, playIntent)
         }
 
         val intent = Intent(ACTION_STOP).apply { setClass(this@PeremenService, PeremenService::class.java) }
-        val stopIntent = PendingIntent.getService(this, 0, intent, 0)
+        val stopIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val stopTitle = getString(R.string.notification_action_stop)
         notificationBuilder.addAction(R.drawable.ic_baseline_stop_circle_24, stopTitle, stopIntent)
 
