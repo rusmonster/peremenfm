@@ -57,6 +57,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: 'fm.peremen.android'
           aabFilePath: 'app-release.aab'
+          changesNotSentForReview: true
           track: 'internal'
 
   # sent_telegram_message:
