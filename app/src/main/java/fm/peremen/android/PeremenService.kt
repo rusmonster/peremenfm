@@ -3,6 +3,7 @@ package fm.peremen.android
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -43,7 +44,11 @@ class PeremenService : Service() {
         }
 
         val notification = createNotification();
-        startForeground(NOTIFICATION_ID, notification)
+
+        if (Build.VERSION.SDK_INT >= 29)
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MANIFEST)
+        else
+            startForeground(NOTIFICATION_ID, notification)
 
         PeremenManager.onChanged += this::onManagerChanged
     }
